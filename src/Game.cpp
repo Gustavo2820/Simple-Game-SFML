@@ -110,8 +110,21 @@ void Game::spawnEnemy()
     //Insere o inimigo no vector para spawna-lo
    this->enemies.push_back(this->enemy);
 
-   //Remove inimigo no fim da tela
+}
 
+void Game::playSound(std::string filePath)
+{
+        if(!this->buffer.loadFromFile(filePath)) {
+            std::cout << "ERROR::GAME::PLAYSOUND::Failed to load sound." << "\n";
+        }
+
+        this->sound.setBuffer(buffer);
+        this->sound.setVolume(100.f);
+        this->sound.play();
+        if (this->sound.getStatus() != sf::Sound::Status::Playing)
+        {
+            std::cout << "ERROR::GAME::PLAYSOUND::Failed to play sound." << "\n";
+        }
 }
 
 void Game::pollEvents()
@@ -135,6 +148,78 @@ void Game::pollEvents()
         }
 }
 
+void Game::setText(unsigned int size, sf::Color color, std::string string, sf::Vector2f position)
+{
+    this->uiText.setCharacterSize(size);
+    this->uiText.setFillColor(color);
+    this->uiText.setString(string);
+    this->uiText.setPosition(position);
+}
+
+bool Game::printMenu()
+{
+    bool startGame = false;
+    sf::Text title("FALLING BLOCKS", this->font, 50);
+    title.setFillColor(sf::Color::Cyan);
+    title.setPosition(400.f - title.getGlobalBounds().width / 2.f, 50.f);
+
+    sf::Text startText("- Start Game", this->font, 30);
+    startText.setFillColor(sf::Color::Cyan);
+    startText.setPosition(400.f - startText.getGlobalBounds().width / 2.f, 300.f);
+
+    sf::Text exitText("- Exit Game", this->font, 30);
+    exitText.setFillColor(sf::Color::Cyan);
+    exitText.setPosition(400.f - exitText.getGlobalBounds().width / 2.f, 400.f);
+
+    bool mouseHeld = false;
+
+
+    while(!startGame)
+    {
+        this->updateMousePos();
+
+        this->window->clear(sf::Color::Black);
+        this->window->draw(title);
+        this->window->draw(startText);
+        this->window->draw(exitText);
+        this->window->display();
+
+        bool mouseHoverStart = startText.getGlobalBounds().contains(this->mousePosView);
+        bool mouseHoverExit = exitText.getGlobalBounds().contains(this->mousePosView);
+
+        if(mouseHoverStart)
+        {
+            startText.setFillColor(sf::Color::Green);
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                startGame = true;
+            }
+        }
+        else startText.setFillColor(sf::Color::Cyan);
+
+        if(mouseHoverExit)
+        {
+            exitText.setFillColor(sf::Color::Red);
+
+            if(mouseHeld && !sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                this->window->close();
+                return false;
+            }
+        } else exitText.setFillColor(sf::Color::Cyan);
+
+        mouseHeld = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
+        {
+            this->window->close();
+            return false;
+        }
+    }
+    return true;
+}
+
 void Game::printGameOver()
 {
     bool closeGame = false;
@@ -143,11 +228,11 @@ void Game::printGameOver()
 
     sf::Text text("GAME OVER\n", this->font, 60);
     text.setFillColor(sf::Color::Red);
-    text.setPosition(400.f - text.getGlobalBounds().width / 2.f, 300.f - text.getGlobalBounds().height / 2.f);
+    text.setPosition(400.f - text.getGlobalBounds().width / 2.f, 300.f - text.getGlobalBounds().height / 2.f - 50.f);
 
     sf::Text points(textString, this->font, 40);
     points.setFillColor(sf::Color::Red);
-    points.setPosition(400.f - points.getGlobalBounds().width / 2.f, 350.f - points.getGlobalBounds().height / 2.f);
+    points.setPosition(400.f - points.getGlobalBounds().width / 2.f, 350.f - points.getGlobalBounds().height / 2.f - 50.f);
 
     while(!closeGame)
     {
@@ -282,8 +367,10 @@ void Game::updateText()
     std::stringstream string;
 
     string << "Points: " << this->points;
-
-    this->uiText.setString(string.str());
+    sf::Vector2f position;
+    position.x = 0.f;
+    position.y = 0.f;
+    this->setText(12, sf::Color::White, string.str(), position);
 }
 
 void Game::update()
