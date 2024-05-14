@@ -12,20 +12,25 @@ int main()
 
     //Loop do Jogo
     bool end = false;
-    while(game.running() && !end)
+    
+    if(game.printMenu())
     {
-        //Update
-        game.update();
-
-        //Renderizar
-        game.render();
-
-        if(game.getEndGame())
+        while(game.running() && !end)
         {
-            game.printGameOver();
-            end = true;
+
+            //Update
+            game.update();
+
+            //Renderizar
+            game.render();
+
+            if(game.getEndGame())
+            {
+                game.printGameOver();
+                end = true;
+            }
         }
-    }
+    } 
 
     //Fim
     return 0;
