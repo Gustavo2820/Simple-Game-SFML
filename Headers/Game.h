@@ -19,6 +19,7 @@
 class Game {
     private:
         //Variáveis
+
         //Window
         sf::RenderWindow* window;
         sf::VideoMode videoMode;
@@ -31,6 +32,8 @@ class Game {
         //Recursos
         sf::Font font;
         sf::Text uiText;
+        sf::Sound sound;
+        sf::SoundBuffer buffer;
 
         //Logica
         bool endGame;
@@ -63,17 +66,23 @@ class Game {
         int getPoints();
 
         //Funções
+
         void spawnEnemy();
-
+        void playSound(std::string filePath);
         void pollEvents();
+        void setText(unsigned int size, sf::Color color, std::string string, sf::Vector2f position);
 
+        //Telas Auxiliares
+        bool printMenu();
         void printGameOver();
 
+        //Update functions
         void update();
         void updateEnemies();
         void updateMousePos();
         void updateText();
 
+        //Render Functions
         void render();
         void renderEnemies(sf::RenderTarget& target);
         void renderText(sf::RenderTarget& target);
